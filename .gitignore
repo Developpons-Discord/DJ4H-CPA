@@ -1,3 +1,4 @@
 token.txt
 conf/*
 .idea
+.env
