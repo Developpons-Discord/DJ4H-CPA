@@ -1,4 +1,4 @@
 token.txt
-src/conf/*
+conf/*
 .idea
 .env
