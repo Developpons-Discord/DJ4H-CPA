@@ -2,3 +2,5 @@ token.txt
 conf/*
 .idea
 .env
+events/__pycache__
+commands/__pycache__
