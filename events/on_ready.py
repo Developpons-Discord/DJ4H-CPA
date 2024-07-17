@@ -6,6 +6,7 @@ import datetime
 
 FOOTER = "🎪 DJ4H-CPA"
 
+
 class OnReadyEvent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -128,7 +129,7 @@ class OnReadyEvent(commands.Cog):
 
                     logEmbed.add_field(
                         name=":bust_in_silhouette: Auteur",
-                        value=f"{message.author.name}",
+                        value=f"<@{message.author.id}>",
                         inline=False
                     )
 
@@ -147,9 +148,9 @@ class OnReadyEvent(commands.Cog):
                     logEmbed.set_footer(text=FOOTER)
                     logEmbed.set_thumbnail(url=f"{message.author.avatar.url}")
 
-
                     logChannel = self.bot.get_channel(logChannelID)
                     await logChannel.send(embed=logEmbed)
+
 
 def setup(bot):
     bot.add_cog(OnReadyEvent(bot))

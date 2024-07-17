@@ -18,10 +18,10 @@ Le comportement attendu du bot est détaillé dans le
 
 ### Instructions
 
-1. Créer le fichier `token.txt` et y coller le token du bot.
+1. Ajouter une variable d'environnement nommée `DISCORD_TOKEN` avec votre token du bot comme valeur
 2. Démarrer le bot :
 ```shell
-python main.py
+python bot.py
 ```
 
 ## Utilisation
@@ -29,13 +29,15 @@ python main.py
 ### Installation
 
 Une fois le bot invité sur le serveur, il est nécessaire de le configurer avec la commande 
-`/configuration [canal] (temps)`. Cette commande permet de spécifier le canal du serveur dans lequel le jeu aura lieu, 
-ainsi que la durée (en heure) minimum entre deux messages pour marquer un point.
+`/setup [canal] (temps) (historique)`. Cette commande permet de spécifier le canal du serveur dans lequel le jeu aura lieu,
+la durée (en heure) minimum entre deux messages pour marquer un point, ainsi que le canal où seront envoyés l'historique 
+des gains de points.
 
 Paramètres :
 - `canal: discord.TextChannel` (obligatoire) : Le canal textuel dédié au jeu.
 - `temps: int` (optionnel) : Durée minimum requise entre deux messages pour marquer un point. Cette valeur doit être 
 comprise entre `1`et `10`. La valeur par défaut est `4`.
+- `historique: discord.TextChannel` (optionnel) : Un message sera envoyé à chaque fois qu'un nouveau gagnant est désigné.
 
 > **Remarques :**
 > - Il n'est possible d'avoir qu'un seul canal dédié au jeu dans un serveur.
