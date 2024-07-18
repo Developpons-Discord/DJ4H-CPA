@@ -6,6 +6,7 @@ import datetime
 
 FOOTER = "🎪 DJ4H-CPA"
 
+
 class OnReadyEvent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -13,6 +14,35 @@ class OnReadyEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        for guild in self.bot.guilds:
+            conf_file_path = f"conf/{guild.id}.yml"
+
+            if not os.path.exists(conf_file_path):
+                continue
+
+            with open(conf_file_path, "r") as conf_file:
+                data = yaml.safe_load(conf_file)
+
+            gameChannelID = data['gameChannelID']
+            lastMessageID = data.get("lastMessageID", None)
+
+            gameChannel = self.bot.get_channel(gameChannelID)
+            new_last_message_id = None
+
+            if lastMessageID is not None:
+                async for message in gameChannel.history(limit=100):
+                    if not message.author.bot:
+                        if lastMessageID is None or message.id != lastMessageID:
+                            new_last_message_id = message.id
+                            new_last_message_time = message.created_at
+                            break
+
+            if new_last_message_id:
+                data['lastMessageID'] = new_last_message_id
+                data['lastMessageTime'] = new_last_message_time
+                with open(conf_file_path, "w") as conf_file:
+                    yaml.safe_dump(data, conf_file)
+
         print(f"{self.bot.user} is ready and online!")
 
     @tasks.loop(seconds=10)
@@ -30,6 +60,7 @@ class OnReadyEvent(commands.Cog):
             gameChannelID = data.get('gameChannelID')
             gameTime = data.get('gameTime')
             winners = data.get('winners', {})
+            logChannelID = data.get('logChannelID')
 
             if not lastMessageID or not lastMessageTime or not gameChannelID:
                 continue
@@ -38,7 +69,7 @@ class OnReadyEvent(commands.Cog):
 
             actualTime = datetime.datetime.now(datetime.timezone.utc)
             elapsedTime = actualTime - lastMessageTime
-            minutes_passed = elapsedTime.total_seconds() // 60
+            minutes_passed = elapsedTime.total_seconds() // 3600
 
             if minutes_passed >= gameTime:
                 message = await gameChannel.fetch_message(lastMessageID)
@@ -87,6 +118,39 @@ class OnReadyEvent(commands.Cog):
 
                 congrats_message = f"Félicitations <@{message.author.id}>! Tu as gagné un point :trophy:!"
                 await gameChannel.send(congrats_message)
+
+                if logChannelID:
+                    logEmbed = discord.Embed(
+                        title=":trophy: Nouveau gagnant !",
+                        description="Un nouveau membre a gagné un point !",
+                        color=discord.Color.gold(),
+                        timestamp=datetime.datetime.now(datetime.timezone.utc)
+                    )
+
+                    logEmbed.add_field(
+                        name=":bust_in_silhouette: Auteur",
+                        value=f"<@{message.author.id}>",
+                        inline=False
+                    )
+
+                    logEmbed.add_field(
+                        name=":speech_balloon: Contenu",
+                        value=f"https://discord.com/channels/{gameChannel.guild.id}/{gameChannelID}/{lastMessageID}",
+                        inline=False
+                    )
+
+                    logEmbed.add_field(
+                        name=":clock3: Heure du gain",
+                        value=f"{datetime.datetime.now(datetime.timezone.utc).strftime('%d/%m/%Y %H:%M:%S')}",
+                        inline=False
+                    )
+
+                    logEmbed.set_footer(text=FOOTER)
+                    logEmbed.set_thumbnail(url=f"{message.author.avatar.url}")
+
+                    logChannel = self.bot.get_channel(logChannelID)
+                    await logChannel.send(embed=logEmbed)
+
 
 def setup(bot):
     bot.add_cog(OnReadyEvent(bot))
