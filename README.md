@@ -24,6 +24,35 @@ Le comportement attendu du bot est détaillé dans le
 python bot.py
 ```
 
+## Déploiement
+
+### Docker
+
+Dans un premier temps, il faut cloner le répertoire GitHub :
+```shell
+git clone https://github.com/Developpons-Discord/DJ4H-CPA .
+```
+Pour assurer le bon fonctionnement du bot, il est important de passer le token dans le conteneur en tant que variable 
+d'environnement sous le nom `DISCORD_TOKEN`.
+
+Les données du bot étant conservées dans le répertoire `/conf`, il faut donc également ajouter un volume afin de monter 
+un volume de la machine hôte au répertoire `/bot/conf`.
+
+Voici un example de fichier `compose.yaml` pour lancer le bot :
+```yaml
+name: "DJ4H-CPA"
+
+services:
+  bot:
+    build: .
+    environment:
+      - DISCORD_TOKEN="<your_discord_token>"
+    volumes:
+      - "/local/path:/bot/conf"
+```
+
+
+
 ## Utilisation
 
 ### Installation
