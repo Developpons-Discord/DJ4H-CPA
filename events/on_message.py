@@ -23,15 +23,21 @@ class OnMessageEvent(commands.Cog):
         with open(conf_file_path, "r") as conf_file:
             data = yaml.safe_load(conf_file)
 
-        lastMessage = data["lastMessageID"]
-        logChannelID = data['logChannelID']
-        gameChannelID = data['gameChannelID']
+        lastMessage = data.get("lastMessageID")
+        logChannelID = data.get('logChannelID')
+        gameChannelID = data.get('gameChannelID')
 
         gameChannel = self.bot.get_channel(gameChannelID)
 
         if lastMessage:
-            last_message = await gameChannel.fetch_message(lastMessage)
-            if last_message.author.id == message.author.id:
+            try:
+                last_message = await gameChannel.fetch_message(lastMessage)
+                if last_message.author.id == message.author.id:
+                    return
+            except discord.NotFound:
+                data['lastMessageID'] = None
+                data["lastMessageTime"] = None
+            except discord.HTTPException:
                 return
 
         if message.channel.id != gameChannelID:
