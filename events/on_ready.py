@@ -69,7 +69,7 @@ class OnReadyEvent(commands.Cog):
     
             actualTime = datetime.datetime.now(datetime.timezone.utc)
             elapsedTime = actualTime - lastMessageTime
-            minutes_passed = elapsedTime.total_seconds()
+            minutes_passed = elapsedTime.total_seconds() // 3600
     
             if minutes_passed >= gameTime:
                 try:
